@@ -4,50 +4,22 @@ import * as graphqlHTTP from 'express-graphql';
 import { connectToDb } from './data';
 import { Story, StoryReq } from './data/entities/Story';
 import { getManager } from 'typeorm';
+import { readFile } from 'fs';
 
 async function main() {
 
     await connectToDb();
     const repo = getManager().getRepository(Story);
+    const query = getManager().createQueryBuilder(Story, "story");
 
-    const schema = buildSchema(`
-
-        enum Privacy {
-            public
-            private
-        }
-
-        type Story {
-            id: Int!
-            launchDate: String!
-            title: String!
-            privacy: Privacy!
-            likes: Int!
-        }
-
-        input StoryReq {
-            launchDate: String!
-            title: String!
-            privacy: Privacy!
-            likes: Int!
-        }
-        
-        type Query {
-            getStories: [Story!]!
-        }
-
-        type Mutation {
-            createStory(s: StoryReq!): Story!
-        }
-          
-    `)
+    const s = await readFileP('dist/schema.graphql')
+    const schema = buildSchema(s);
 
     const app = express()
 
     const rootValue = {
         getStories: async (args: null, req: express.Request): Promise<Story[]> => {
-            return getManager()
-                .createQueryBuilder(Story, "story")
+            return query
                 .where("story.privacy = :p1", { p1: 'public' })
                 .andWhere("story.likes > :p2", { p2: 20 })
                 .getMany();
@@ -65,6 +37,15 @@ async function main() {
     }))
 
     app.listen(3000, () => console.log('listening on 3000'))
+}
+
+function readFileP(p: string): Promise<string> {
+    return new Promise((res, rej) => {
+        readFile(p, (err, f) => {
+            if(err) return rej(err)
+            return res(f.toString())
+        })
+    })
 }
 
 main()

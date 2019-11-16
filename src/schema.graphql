@@ -1,0 +1,27 @@
+enum Privacy {
+    public
+    private
+}
+
+type Story {
+    id: Int!
+    launchDate: String!
+    title: String!
+    privacy: Privacy!
+    likes: Int!
+}
+
+input StoryReq {
+    launchDate: String!
+    title: String!
+    privacy: Privacy!
+    likes: Int!
+}
+
+type Query {
+    getStories: [Story!]!
+}
+
+type Mutation {
+    createStory(s: StoryReq!): Story!
+}
