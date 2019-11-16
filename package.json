@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:local": "npm run build && node dist/server.js",
+    "start:local": "npm run build && node -r dotenv/config dist/server.js",
     "build": "npm run clean && tsc",
     "clean": "rm -rf dist"
   },
@@ -17,6 +17,8 @@
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
+    "mysql": "^2.17.1",
+    "typeorm": "^0.2.20",
     "typescript": "^3.7.2"
   }
 }

@@ -1,99 +1,75 @@
 import * as express from 'express';
 import { buildSchema } from 'graphql';
 import * as graphqlHTTP from 'express-graphql';
+import { connectToDb } from './data';
+import { Story, StoryReq } from './data/entities/Story';
+import { getManager } from 'typeorm';
 
+async function main() {
 
-const cats = [
-    { id: 1, name: 'sam', age: 5 },
-    { id: 2, name: 'john', age: 2 }
-]
+    await connectToDb();
+    const repo = getManager().getRepository(Story);
 
-const stories = [
-    {
-        body: "in a land far away...",
-        public: true,
-        likes : [
-            {
-                code : 1
-            },
-            {
-                code : 1
-            },
-            {
-                code : 0
-            }
-        ]
-    },
-    {
-        body: "once upon a time...",
-        public: true,
-        likes : [
-            {
-                code : 1
-            },
-            {
-                code : 0
-            },
-            {
-                code : 0
-            }
-        ]
-    },
-    {
-        body: "there was a boy...",
-        public: false,
-        likes : [
-            {
-                code : 0
-            },
-            {
-                code : 0
-            },
-            {
-                code : 0
-            }
-        ]
-    }
-]
+    const schema = buildSchema(`
 
-const schema = buildSchema(`
-    type Like {
-        code: Int!
-    }
-    type Story {
-        body: String!
-        public: Boolean!
-        likes: [Like!]!
-    }
-    type Cat {
-        id: Int!
-        name: String!
-        age: Int!
-    }
-    type Query {
-        cat(id: Int!) : Cat!
-        stories: [Story!]!
-    }
-`)
+        enum Privacy {
+            public
+            private
+        }
 
-const app = express()
+        type Story {
+            id: Int!
+            launchDate: String!
+            title: String!
+            privacy: Privacy!
+            likes: Int!
+        }
 
-const rootValue = {
-    cat: (args: { id: number }, req: express.Request) => {
-        return cats.find(el => el.id === args.id)
-    },
-    stories: (args: null, req: express.Request) => {
-        return stories.filter(el => {
-            return el.public && (el.likes.filter(el => !!el.code )).length >= 1
-        })
+        input StoryReq {
+            launchDate: String!
+            title: String!
+            privacy: Privacy!
+            likes: Int!
+        }
+        
+        type Query {
+            getStories: [Story!]!
+        }
+
+        type Mutation {
+            createStory(s: StoryReq!): Story!
+        }
+          
+    `)
+
+    const app = express()
+
+    const rootValue = {
+        getStories: async (args: null, req: express.Request): Promise<Story[]> => {
+            return getManager()
+                .createQueryBuilder(Story, "story")
+                .where("story.privacy = :p1", { p1: 'public' })
+                .andWhere("story.likes > :p2", { p2: 20 })
+                .getMany();
+        },
+        createStory: async (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
+            const m = repo.create(args.s)
+            return repo.save(m);
+        }
     }
+
+    app.use('/graphql', graphqlHTTP({
+        schema,
+        rootValue,
+        graphiql: true
+    }))
+
+    app.listen(3000, () => console.log('listening on 3000'))
 }
 
-app.use('/graphql', graphqlHTTP({
-    schema,
-    rootValue,
-    graphiql: true
-}))
-
-app.listen(3000, () => console.log('listening on 3000'))
+main()
+    .catch(err => {
+        console.error(err)
+        process.exit(1)
+    })
 
