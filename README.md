@@ -8,5 +8,7 @@ $ npm install && npm start
 
 Open you browser to localhost:3000/graphql
 
+![query results](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/query.png "query results")
+
 
 
