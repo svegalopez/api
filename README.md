@@ -6,6 +6,8 @@ Once the data has been migrated and you have created a ```.env``` file with your
 $ npm install && npm start
 ```
 
+If you are using vscode, make sure to use the workspace version of typescript and not vscode's version. This is because we are using one of the latest features "Omit" and vscode's version might not support it.
+
 Open you browser to localhost:3000/graphql. You will be able to perform a query and a mutation.
 The query results shown below (all public stories, with > 20 likes) :
 
