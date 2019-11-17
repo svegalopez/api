@@ -18,5 +18,6 @@ And a mutation to insert a story:
 ![mutation result](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/mutation.png "mutation result")
 
 
+# Comments
 
-
+I had never used graphql before, and I think its awesome. Im sure there's much to learn about it and I would be excited to do it. I was able to setup this basic example with no problem, open to feedback!
