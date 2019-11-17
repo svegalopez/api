@@ -18,13 +18,13 @@ async function main() {
     const app = express()
 
     const rootValue = {
-        getStories: async (args: null, req: express.Request): Promise<Story[]> => {
+        getStories: (args: null, req: express.Request): Promise<Story[]> => {
             return req.queryBuilder
                 .where("story.privacy = :p1", { p1: 'public' })
                 .andWhere("story.likes > :p2", { p2: 20 })
                 .getMany();
         },
-        createStory: async (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
+        createStory: (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
             const m = req.repo.create(args.s)
             return req.repo.save(m);
         }
