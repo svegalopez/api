@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:local": "npm run build && node -r dotenv/config dist/server.js",
+    "start": "npm run build && node -r dotenv/config dist/server.js",
     "build": "npm run clean && tsc && cp src/schema.graphql dist/schema.graphql",
     "clean": "rm -rf dist"
   },
