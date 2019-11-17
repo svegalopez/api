@@ -11,5 +11,10 @@ The query results shown below (all public stories, with > 20 likes) :
 
 ![query results](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/query.png "query results")
 
+And a mutation to insert a story:
+
+![query results](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/query.png "query results")
+
+
 
 
