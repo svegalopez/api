@@ -26,7 +26,7 @@ async function main() {
         },
         createStory: async (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
             const m = req.repo.create(args.s)
-            return repo.save(m);
+            return req.repo.save(m);
         }
     }
 
