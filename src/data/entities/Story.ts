@@ -1,5 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn, AfterLoad } from 'typeorm';
 
+enum Privacy {
+    private = "private",
+    public = "public"
+}
+
 @Entity({
     name: 'stories',
 })
@@ -15,7 +20,7 @@ export class Story {
     title!: string
 
     @Column({ type: 'varchar', length: '32' })
-    privacy!: "private" | "public"
+    privacy!: Privacy
 
     @Column()
     likes!: number
