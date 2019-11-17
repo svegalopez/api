@@ -10,7 +10,7 @@ async function main() {
 
     await connectToDb();
     const repo = getManager().getRepository(Story);
-    const query = getManager().createQueryBuilder(Story, "story");
+    const queryBuilder = getManager().createQueryBuilder(Story, "story");
 
     const s = await readFileP('dist/schema.graphql')
     const schema = buildSchema(s);
@@ -19,16 +19,22 @@ async function main() {
 
     const rootValue = {
         getStories: async (args: null, req: express.Request): Promise<Story[]> => {
-            return query
+            return req.queryBuilder
                 .where("story.privacy = :p1", { p1: 'public' })
                 .andWhere("story.likes > :p2", { p2: 20 })
                 .getMany();
         },
         createStory: async (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
-            const m = repo.create(args.s)
+            const m = req.repo.create(args.s)
             return repo.save(m);
         }
     }
+
+    app.use('/graphql', (req, res, next) => { 
+        req.queryBuilder = queryBuilder;
+        req.repo = repo
+        next()
+    })
 
     app.use('/graphql', graphqlHTTP({
         schema,
