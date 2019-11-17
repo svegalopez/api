@@ -13,7 +13,7 @@ The query results shown below (all public stories, with > 20 likes) :
 
 And a mutation to insert a story:
 
-![query results](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/query.png "query results")
+![mutation result](https://raw.githubusercontent.com/svegalopez/gql-example/master/screenshots/mutation.png "mutation result")
 
 
 
