@@ -1,10 +1,12 @@
 import * as express from 'express';
 import { buildSchema } from 'graphql';
+import { makeExecutableSchema } from 'graphql-tools';
 import * as graphqlHTTP from 'express-graphql';
 import { connectToDb } from './data';
 import { Story, StoryReq } from './data/entities/Story';
 import { getManager } from 'typeorm';
-import { readFile } from 'fs';
+import { readFileSync } from 'fs';
+import { join } from 'path'
 
 async function main() {
 
@@ -12,25 +14,31 @@ async function main() {
     const repo = getManager().getRepository(Story);
     const queryBuilder = getManager().createQueryBuilder(Story, "story");
 
-    const s = await readFileP('dist/schema.graphql')
-    const schema = buildSchema(s);
-
-    const app = express()
-
-    const rootValue = {
-        getStories: async (args: null, req: express.Request): Promise<Story[]> => {
-            return req.queryBuilder
-                .where("story.privacy = :p1", { p1: 'public' })
-                .andWhere("story.likes > :p2", { p2: 20 })
-                .getMany();
+    const resolvers = {
+        Query: {
+            getStories: async (parent: null, args: null, req: express.Request): Promise<Story[]> => {
+                console.log('parent: ', parent)
+                return req.queryBuilder
+                    .where("story.privacy = :p1", { p1: 'public' })
+                    .andWhere("story.likes > :p2", { p2: 20 })
+                    .getMany();
+            }
         },
-        createStory: async (args: { s: StoryReq }, req: express.Request): Promise<Story> => {
-            const m = req.repo.create(args.s)
-            return repo.save(m);
+        Mutation: {
+            createStory: async (parent: null, args: { s: StoryReq }, req: express.Request): Promise<Story> => {
+                const m = req.repo.create(args.s)
+                return repo.save(m);
+            }
         }
     }
 
-    app.use('/graphql', (req, res, next) => { 
+    const schemaFile = join(__dirname, "schema.graphql");
+    const typeDefs = readFileSync(schemaFile, "utf8");
+    const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+    const app = express()
+
+    app.use('/graphql', (req, res, next) => {
         req.queryBuilder = queryBuilder;
         req.repo = repo
         next()
@@ -38,20 +46,10 @@ async function main() {
 
     app.use('/graphql', graphqlHTTP({
         schema,
-        rootValue,
         graphiql: true
     }))
 
     app.listen(3000, () => console.log('listening on 3000'))
-}
-
-function readFileP(p: string): Promise<string> {
-    return new Promise((res, rej) => {
-        readFile(p, (err, f) => {
-            if(err) return rej(err)
-            return res(f.toString())
-        })
-    })
 }
 
 main()
