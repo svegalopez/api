@@ -20,4 +20,4 @@ And a mutation to insert a story:
 
 # Comments
 
-I had never used graphql before, and I think its awesome. Im sure there's much to learn about it and I would be excited to do it. I was able to setup this basic example with no problem, open to feedback!
+I had never used graphql before, and I think its awesome. Im sure there's much to learn about it and I would be excited to do it. I was able to setup this basic example with no problem, open to feedback! It would be nice to use some code generation in order to maintain a single source of truth, such as generating typescript definitions from the graphql schema.
