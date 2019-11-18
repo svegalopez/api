@@ -27,13 +27,6 @@ async function main() {
                 const m = req.repo.create(args.s)
                 return repo.save(m);
             }
-        },
-        Story : {
-            launchDate : (parent: Story, args: any, req: any): string => {
-                console.log('parent', parent)
-                console.log('args', args)
-                return parent.launchDate
-            }
         }
     }
 
