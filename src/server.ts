@@ -24,8 +24,8 @@ async function main() {
         },
         Mutation: {
             createStory: (parent: undefined, args: { s: StoryReq }, req: express.Request): Promise<Story> => {
-                const m = req.repo.create(args.s)
-                return req.repo.save(m);
+                const s = req.repo.create(args.s)
+                return req.repo.save(s);
             }
         }
     }
