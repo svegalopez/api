@@ -1,5 +1,4 @@
 import * as express from 'express';
-import { buildSchema } from 'graphql';
 import { makeExecutableSchema } from 'graphql-tools';
 import * as graphqlHTTP from 'express-graphql';
 import { connectToDb } from './data';
@@ -16,8 +15,7 @@ async function main() {
 
     const resolvers = {
         Query: {
-            getStories: async (parent: null, args: null, req: express.Request): Promise<Story[]> => {
-                console.log('parent: ', parent)
+            getStories: (parent: undefined, args: {}, req: express.Request): Promise<Story[]> => {
                 return req.queryBuilder
                     .where("story.privacy = :p1", { p1: 'public' })
                     .andWhere("story.likes > :p2", { p2: 20 })
@@ -25,9 +23,16 @@ async function main() {
             }
         },
         Mutation: {
-            createStory: async (parent: null, args: { s: StoryReq }, req: express.Request): Promise<Story> => {
+            createStory: (parent: undefined, args: { s: StoryReq }, req: express.Request): Promise<Story> => {
                 const m = req.repo.create(args.s)
                 return repo.save(m);
+            }
+        },
+        Story : {
+            launchDate : (parent: Story, args: any, req: any): string => {
+                console.log('parent', parent)
+                console.log('args', args)
+                return parent.launchDate
             }
         }
     }
